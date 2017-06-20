@@ -1,5 +1,6 @@
 package com.example.todos;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -15,6 +16,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.example.todos.data.DatabaseHelper;
+import com.example.todos.data.TodosContract;
 
 public class TodoListActivity extends AppCompatActivity {
 
@@ -31,9 +33,10 @@ public class TodoListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         //https://app.pluralsight.com/player?course=android-database-application-sqlite-building-your-first&author=simone-alessandria&name=android-database-application-sqlite-building-your-first-m3&clip=3&mode=live
-        DatabaseHelper helper = new DatabaseHelper(this);
-        SQLiteDatabase db = helper.getReadableDatabase();
+   //     DatabaseHelper helper = new DatabaseHelper(this);
+   //    SQLiteDatabase db = helper.getReadableDatabase();
 
+        CreateTodo();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -60,5 +63,28 @@ public class TodoListActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+    }
+
+    private void CreateTodo(){
+        DatabaseHelper helper = new DatabaseHelper(this);
+        SQLiteDatabase db = helper.getWritableDatabase();
+
+        String query =  "INTEGER INTO todos (" +
+                TodosContract.TodosEntry.COLUMN_TEXT +
+                TodosContract.TodosEntry.COLUMN_CATEGORY +
+                TodosContract.TodosEntry.COLUMN_CREATED +
+                TodosContract.TodosEntry.COLUMN_EXPIRED +
+                TodosContract.TodosEntry.COLUMN_DONE +
+                " VALUES (\"Go to the gym\", 1, \"2016-01-01\", \"\", 0)";
+                db.execSQL(query);
+
+        ContentValues values = new ContentValues();
+
+        values.put(TodosContract.TodosEntry.COLUMN_TEXT, "Call me");
+        values.put(TodosContract.TodosEntry.COLUMN_CATEGORY, 1);
+        values.put(TodosContract.TodosEntry.COLUMN_CREATED, "2016-01-02");
+        values.put(TodosContract.TodosEntry.COLUMN_DONE, 0);
+
+        long todo_id = db.insert(TodosContract.TodosEntry.TABLE_NAME, null, values);
     }
 }
