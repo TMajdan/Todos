@@ -1,17 +1,21 @@
 package com.example.todos.data;
 
+import android.net.Uri;
 import android.provider.BaseColumns;
 
-/**
- * Created by wojciech.majdan on 2017-06-20.
- */
-// CONTRACT
-    // https://app.pluralsight.com/player?course=android-database-application-sqlite-building-your-first&author=simone-alessandria&name=android-database-application-sqlite-building-your-first-m3&clip=1&mode=live
-
-
 public final class TodosContract {
+    //URI section
+    public static final String CONTENT_AUTHORITY = "com.example.todos.todosprovider";
+    public static final String PATH_TODOS="todos";
+    public static final String PATH_CATEGORIES="categories";
+    public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
+
+    public String concatContent(String path){
+        return "content://" + path;
+    }
 
     public static final class TodosEntry implements BaseColumns {
+        public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_TODOS);
 
         // Table name
         public static final String TABLE_NAME = "todos";
@@ -25,12 +29,12 @@ public final class TodosContract {
     }
 
     public static final class CategoriesEntry implements BaseColumns {
+        public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_CATEGORIES);
+
         // Table name
         public static final String TABLE_NAME = "categories";
         //column names
         public static final String _ID = BaseColumns._ID;
         public static final String COLUMN_DESCRIPTION = "description";
     }
-
-
 }

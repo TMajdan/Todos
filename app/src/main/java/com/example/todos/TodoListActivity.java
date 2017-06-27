@@ -2,12 +2,14 @@ package com.example.todos;
 
 import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,16 +29,60 @@ public class TodoListActivity extends AppCompatActivity {
             "Running session at 19.30",
             "Call Uncle Sam"
     };
+
+
+    private void updateTodo(){
+        int id = 1;
+        DatabaseHelper helper = new DatabaseHelper(this);
+        SQLiteDatabase db = helper.getReadableDatabase();
+        String [] args = {String.valueOf(id)};
+        ContentValues values = new ContentValues();
+        values.put(TodosContract.TodosEntry.COLUMN_TEXT, "Call Mr Bond");
+
+    }
+
+
+    private void readData(){
+        DatabaseHelper helper = new DatabaseHelper(this);
+        SQLiteDatabase db = helper.getReadableDatabase();
+        String [] projection = {TodosContract.TodosEntry.COLUMN_TEXT,
+                TodosContract.TodosEntry.COLUMN_CREATED,
+                TodosContract.TodosEntry.COLUMN_EXPIRED,
+                TodosContract.TodosEntry.COLUMN_DONE,
+                TodosContract.TodosEntry.COLUMN_CATEGORY};
+
+            String selection = TodosContract.TodosEntry.COLUMN_CATEGORY + " = ?";
+            String [] selectionArgs = {"1"};
+
+        Cursor c = db.query(TodosContract.TodosEntry.TABLE_NAME, projection,selection,selectionArgs,null,null,null);
+
+        int i =c.getCount();
+        Log.d("Record Count", String.valueOf(i));
+
+        String rowContent = "";
+        while(c.moveToNext())
+        {
+         for(i=0;i<=4; i++){
+             rowContent += c.getString(i) + " - ";
+         }
+         Log.i("Row " + String.valueOf(c.getPosition()), rowContent);
+            rowContent= "";
+        }
+        c.close();
+
+
+        }
+
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //CreateTodo();
 
-        //https://app.pluralsight.com/player?course=android-database-application-sqlite-building-your-first&author=simone-alessandria&name=android-database-application-sqlite-building-your-first-m3&clip=3&mode=live
-   //     DatabaseHelper helper = new DatabaseHelper(this);
-   //    SQLiteDatabase db = helper.getReadableDatabase();
-
-        CreateTodo();
+        readData();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -65,26 +111,32 @@ public class TodoListActivity extends AppCompatActivity {
         });
     }
 
-    private void CreateTodo(){
+    private void CreateTodo() {
+
         DatabaseHelper helper = new DatabaseHelper(this);
         SQLiteDatabase db = helper.getWritableDatabase();
 
-        String query =  "INTEGER INTO todos (" +
-                TodosContract.TodosEntry.COLUMN_TEXT +
-                TodosContract.TodosEntry.COLUMN_CATEGORY +
-                TodosContract.TodosEntry.COLUMN_CREATED +
-                TodosContract.TodosEntry.COLUMN_EXPIRED +
-                TodosContract.TodosEntry.COLUMN_DONE +
-                " VALUES (\"Go to the gym\", 1, \"2016-01-01\", \"\", 0)";
-                db.execSQL(query);
-
+        helper  = new DatabaseHelper(this);
+        db = helper.getWritableDatabase();
+        //rawQuery
+        String query = "INSERT INTO todos ("
+                + TodosContract.TodosEntry.COLUMN_TEXT + ","
+                + TodosContract.TodosEntry.COLUMN_CATEGORY + ","
+                + TodosContract.TodosEntry.COLUMN_CREATED + ","
+                + TodosContract.TodosEntry.COLUMN_EXPIRED + ","
+                + TodosContract.TodosEntry.COLUMN_DONE + ")"
+                + " VALUES (\"Go to the gym\", 1, \"2016-01-01\", \"\", 0)";
+        db.execSQL(query);//*/
+/*
+        //Insert method; returns the todo ID
         ContentValues values = new ContentValues();
-
-        values.put(TodosContract.TodosEntry.COLUMN_TEXT, "Call me");
+        values.put(TodosContract.TodosEntry.COLUMN_TEXT, "Call Mr Bean");
         values.put(TodosContract.TodosEntry.COLUMN_CATEGORY, 1);
         values.put(TodosContract.TodosEntry.COLUMN_CREATED, "2016-01-02");
         values.put(TodosContract.TodosEntry.COLUMN_DONE, 0);
-
+        // insert row
         long todo_id = db.insert(TodosContract.TodosEntry.TABLE_NAME, null, values);
+        return todo_id;
+        */
     }
 }
